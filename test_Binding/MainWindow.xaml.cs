@@ -25,6 +25,11 @@ namespace test_Binding
         {
             InitializeComponent();
         }
+
+        private void TabItem_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            (this.DataContext as MainWindowVM).InitTime = DateTime.Now;
+        }
     }
 
     public class MainWindowVM : INotifyPropertyChanged
@@ -47,9 +52,29 @@ namespace test_Binding
         }
         #endregion
 
+
+        #region InitTime変更通知プロパティ
+        private DateTime _InitTime;
+
+        public DateTime InitTime
+        {
+            get
+            { return _InitTime; }
+            set
+            { 
+                if (_InitTime == value)
+                    return;
+                _InitTime = value;
+                RaisePropertyChanged("InitTime");
+            }
+        }
+        #endregion
+
+
         public MainWindowVM()
         {
             TextInVM = "VM_TextInVM";
+            InitTime = DateTime.Now;
         } 
 
 
