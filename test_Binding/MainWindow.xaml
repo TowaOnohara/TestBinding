@@ -76,7 +76,8 @@
                     </TextBox.Template>
                 </TextBox>
             </TabItem>
-            
+
+            <!-- DataTemplateを使用すると、テンプレート内のコントロールへのDataContextにはテンプレート適応先のContentが割り当てられる。 -->
             <TabItem Header="DataTemplate">
                 <Label Content="{Binding InitTime}" >
                     <Label.ContentTemplate>
@@ -112,9 +113,23 @@
                         <DataTemplate x:Key="dataTemplate0" DataType="{x:Type system:DateTime}">
                             <Border>
                                 <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="StackPanel.DataContext(RelativeSource): "></TextBlock>
+                                    <TextBlock Text="{Binding DataContext, RelativeSource={RelativeSource AncestorType=StackPanel}}"></TextBlock>
+                                    <TextBlock Text=""></TextBlock>
+                                    <TextBlock Text="(Label.ContextがStackPanel,TextBlockのDataContextに割り当たっている): "></TextBlock>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="StackPanel.DataContext: "></TextBlock>
-                                        <TextBlock Text="{Binding DataContext, RelativeSource={RelativeSource AncestorType=StackPanel}}"></TextBlock>
+                                        <TextBlock Text="{Binding Month}"></TextBlock>
+                                        <TextBlock Text="/"></TextBlock>
+                                        <TextBlock Text="{Binding Day}"></TextBlock>
+                                        <TextBlock Text="/"></TextBlock>
+                                        <TextBlock Text="{Binding Year}"></TextBlock>
+                                        <TextBlock Text=" "></TextBlock>
+                                        <TextBlock Text="{Binding Hour}"></TextBlock>
+                                        <TextBlock Text=":"></TextBlock>
+                                        <TextBlock Text="{Binding Minute}"></TextBlock>
+                                        <TextBlock Text=":"></TextBlock>
+                                        <TextBlock Text="{Binding Second}"></TextBlock>
+                                        <TextBlock Text=" "></TextBlock>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
