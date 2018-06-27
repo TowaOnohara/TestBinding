@@ -24,13 +24,99 @@
 
     <Grid Margin="10,10,10,10">
         <TabControl>
+            <!-- 
+                ControlTemplate: 
+                - 各コントロールの「Templateプロパティ」に割り当てる。
+                - Template内コントロールのDataContextには、TemplateParentのDataContextが割り当てられる。
+            -->
             <TabItem Header="ControlTemplate">
                 <TextBox Text="TextBox_Text" Tag="TextBox_Tag" FontSize="25">
                     <TextBox.Template>
                         <ControlTemplate TargetType="TextBox">
                             <StackPanel Tag="StackPanel_Tag" >
 
+                                <!-- ContentへのBindingには、自分(ContentControl)のDataContextから検索 -->
+                                <Label Content="表示値：ContentControl.DataContext.TextInVM"/>
+                                <ContentControl Content="{Binding TextInVM}" />
+
+                                <!-- ContentへのBindingには、自分(ContentControl)のプロパティから検索（RelativeSource Selfなので） -->
+                                <Label Content="表示値：ContentControl.DataContext.TextInVM (RelativeSource Self)"/>
+                                <ContentControl Content="{Binding DataContext.TextInVM, RelativeSource={RelativeSource Mode=Self}}"/>
+
+                                <!-- ContentへのBindingは、TemplatedParent(TextBox)の Textプロパティ。 （RelativeSource TemplatedParentなので）-->
+                                <Label Content="表示値：ContentControl.Tag(=TextBox.Text)" />
+                                <ContentControl Content="{Binding Text, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
+
+                                <!-- ContentへのBindingは、親コントロール(StackPanel)の Tagプロパティ。（RelativeSource FindAncestor(Type:StackPanel)なので）-->
+                                <Label Content="表示値：StackPanel.Tag" />
+                                <ContentControl Content="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}}"/>
+
+
+                            </StackPanel>
+                        </ControlTemplate>
+                    </TextBox.Template>
+                </TextBox>
+            </TabItem>
+
+            <!-- 
+                ControlTemplate/Style: 
+                - Styleを使用しても考え方は同じ。
+                - Style内で、未指定のときのBinding検索パスは、Style適応先のDataContext。
+                - TemplateParentについても、Style適応先ではなく、親テンプレート（これについてもStyleを使用しない場合と同じ）
+                - Styleは対象コントロールへのプロパティ設定方法の一つなので、（直接割り当てるか、Styleで割り当てるかの違い）Binding検索位置を考えるときは、
+                  直接プロパティを設定しているつもりになればよい。
+            -->
+            <TabItem Header="ControlTemplate/Style">
+                <TextBox Text="TextBox_Text" Tag="TextBox_Tag" FontSize="25">
+                    <TextBox.Template>
+                        <ControlTemplate TargetType="TextBox">
+                            <StackPanel Tag="StackPanel_Tag" >
+
+                                <!-- ContentへのBindingには、自分(ContentControl)のDataContextから検索 -->
+                                <Label Content="表示値：ContentControl.DataContext.TextInVM"/>
+                                <ContentControl>
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="Content" Value="{Binding TextInVM}"/>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+
+                                <!-- ContentへのBindingには、自分(ContentControl)のプロパティから検索（RelativeSource Selfなので） -->
+                                <Label Content="表示値：ContentControl.DataContext.TextInVM (RelativeSource Self)"/>
+                                <ContentControl>
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="Content" Value="{Binding DataContext.TextInVM, RelativeSource={RelativeSource Mode=Self}}"/>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+
+                                <!-- ContentへのBindingは、TemplatedParent(TextBox)の Textプロパティ。（RelativeSource TemplatedParentなので）-->
+                                <!-- ※ TemplatedParentはTextBoxとなる。Styleの適応先ContentControlではないことに注意 ※-->
+                                <Label Content="表示値：ContentControl.Tag(=TextBox.Text)" />
+                                <ContentControl>
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="Content" Value="{Binding Text, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+
+                                <!-- ContentへのBindingは、親コントロール(StackPanel)の Tagプロパティ。（RelativeSource FindAncestor(Type:StackPanel)なので）-->
+                                <Label Content="表示値：StackPanel.Tag" />
+                                <ContentControl>
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="Content" Value="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}}"/>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+
+
+
                                 <!-- TagへのBindingには、RelativeSource未指定なので、自分(ContentControl)のDataContextから検索 -->
+                                <!--（次の定義と同じ：<ContentControl Tag="{Binding TextInVM}" Content="{Binding Tag, RelativeSource={RelativeSource Self}}"） --><!--
                                 <Label Content="表示値：ContentControl.DataContext.TextInVM"/>
                                 <ContentControl Tag="{Binding TextInVM}">
                                     <ContentControl.Style>
@@ -40,7 +126,7 @@
                                     </ContentControl.Style>
                                 </ContentControl>
 
-                                <!-- TagへのBindingは、TemplatedParent(TextBox)の Textプロパティ。 ContentControl.Contentには自身のTag値を表示。（RelativeSource Selfなので）-->
+                                --><!-- TagへのBindingは、TemplatedParent(TextBox)の Textプロパティ。 ContentControl.Contentには自身のTag値を表示。（RelativeSource Selfなので）--><!--
                                 <Label Content="表示値：ContentControl.Tag(=TextBox.Text)" />
                                 <ContentControl Tag="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}">
                                     <ContentControl.Style>
@@ -50,7 +136,7 @@
                                     </ContentControl.Style>
                                 </ContentControl>
 
-                                <!-- TagへのBindingは、TemplatedParent(TextBox)の Textプロパティ。しかし ContentControl.ContentにはTemplatedParent(TextBox)のTag値を表示。（RelativeSource TemplatedParentなので）-->
+                                --><!-- TagへのBindingは、TemplatedParent(TextBox)の Textプロパティ。しかし ContentControl.ContentにはTemplatedParent(TextBox)のTag値を表示。（RelativeSource TemplatedParentなので）--><!--
                                 <Label Content="表示値：TextBox.Tag" />
                                 <ContentControl Tag="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}">
                                     <ContentControl.Style>
@@ -61,7 +147,7 @@
                                 </ContentControl>
 
 
-                                <!-- TagへのBindingは、親コントロール(StackPanel)の Tagプロパティ。ContentControl.Contentには自身のTag値を表示。（RelativeSource Selfなので）-->
+                                --><!-- TagへのBindingは、親コントロール(StackPanel)の Tagプロパティ。ContentControl.Contentには自身のTag値を表示。（RelativeSource Selfなので）--><!--
                                 <Label Content="表示値：StackPanel.Tag" />
                                 <ContentControl Tag="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}}">
                                     <ContentControl.Style>
@@ -69,7 +155,7 @@
                                             <Setter Property="Content" Value="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"/>
                                         </Style>
                                     </ContentControl.Style>
-                                </ContentControl>
+                                </ContentControl>-->
 
                             </StackPanel>
                         </ControlTemplate>
@@ -85,12 +171,18 @@
                             <Border>
                                 <StackPanel Orientation="Vertical">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Path=Year}"></TextBlock>
-                                        <TextBlock Text="年"></TextBlock>
-                                        <TextBlock Text="{Binding Path=Month}"></TextBlock>
-                                        <TextBlock Text="月"></TextBlock>
-                                        <TextBlock Text="{Binding Path=Day}"></TextBlock>
-                                        <TextBlock Text="日"></TextBlock>
+                                        <TextBlock Text="{Binding Month}"></TextBlock>
+                                        <TextBlock Text="/"></TextBlock>
+                                        <TextBlock Text="{Binding Day}"></TextBlock>
+                                        <TextBlock Text="/"></TextBlock>
+                                        <TextBlock Text="{Binding Year}"></TextBlock>
+                                        <TextBlock Text=" "></TextBlock>
+                                        <TextBlock Text="{Binding Hour}"></TextBlock>
+                                        <TextBlock Text=":"></TextBlock>
+                                        <TextBlock Text="{Binding Minute}"></TextBlock>
+                                        <TextBlock Text=":"></TextBlock>
+                                        <TextBlock Text="{Binding Second}"></TextBlock>
+                                        <TextBlock Text=" "></TextBlock>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="StackPanel.DataContext: "></TextBlock>
@@ -112,35 +204,15 @@
                     <Label.Resources>
                         <DataTemplate x:Key="dataTemplate0" DataType="{x:Type system:DateTime}">
                             <Border>
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock Text="StackPanel.DataContext(RelativeSource): "></TextBlock>
-                                    <TextBlock Text="{Binding DataContext, RelativeSource={RelativeSource AncestorType=StackPanel}}"></TextBlock>
-                                    <TextBlock Text=""></TextBlock>
-                                    <TextBlock Text="(Label.ContextがStackPanel,TextBlockのDataContextに割り当たっている): "></TextBlock>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Month}"></TextBlock>
-                                        <TextBlock Text="/"></TextBlock>
-                                        <TextBlock Text="{Binding Day}"></TextBlock>
-                                        <TextBlock Text="/"></TextBlock>
-                                        <TextBlock Text="{Binding Year}"></TextBlock>
-                                        <TextBlock Text=" "></TextBlock>
-                                        <TextBlock Text="{Binding Hour}"></TextBlock>
-                                        <TextBlock Text=":"></TextBlock>
-                                        <TextBlock Text="{Binding Minute}"></TextBlock>
-                                        <TextBlock Text=":"></TextBlock>
-                                        <TextBlock Text="{Binding Second}"></TextBlock>
-                                        <TextBlock Text=" "></TextBlock>
-                                    </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding}" Background="AliceBlue"></TextBlock>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
                         <DataTemplate x:Key="dataTemplate1" DataType="{x:Type system:DateTime}">
                             <Border>
-                                <StackPanel Orientation="Vertical">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Border.DataContext: "></TextBlock>
-                                        <TextBlock Text="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Border}}"></TextBlock>
-                                    </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding}" Background="IndianRed"></TextBlock>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
